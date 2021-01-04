@@ -16,37 +16,30 @@ public class TokenAuthenticationService {
 
 	static final long EXPIRATION_TIME = 1000 * 60; // กำหนดอายุการใช้งานของ token
 	static final String HEADER_STRING = "Authorization";
-	static final String TOKEN_PREFIX = "Bearer";
+	static final String TOKEN_PREFIX = "DBD @2020"; // secrete
 	static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
 	// ทำหน้าที่สร้าง jwt หรือ token โดยจะใช้
 	// Keys.secretKeyFor(SignatureAlgorithm.HS512) มาสร้าง secret key
 	// มากขาก library jjwt มาสุ่มสร้าง key เพื่อความปลอดภัย
 	static void addAuthentication(HttpServletResponse res, String username) {
-		String JWT = Jwts.builder()
-				.setSubject(username)
-				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-				.signWith(SECRET_KEY)
+		String JWT = Jwts.builder().setSubject(username)
+				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)).signWith(SECRET_KEY)
 				.compact();
 		res.addHeader(HEADER_STRING, TOKEN_PREFIX + " " + JWT);
-//		System.out.println("Date is " + new Date(System.currentTimeMillis() + EXPIRATION_TIME));
 	}
 
 	// ทำหน้าที่เปรียบเทียบ signature ว่าตรงกับของเดิมไหม
 	static Authentication getAuthentication(HttpServletRequest req) {
 		String token = req.getHeader(HEADER_STRING);
-		if(token == null) {
+		if (token == null) {
 			return null;
 		}
 
-		String username = Jwts.parser()
-				.setSigningKey(SECRET_KEY)
-				.parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
-				.getBody()
-				.getSubject();
+		String username = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
+				.getBody().getSubject();
 
-		return username != null ?
-				new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList())
+		return username != null ? new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList())
 				: null;
 	}
 }

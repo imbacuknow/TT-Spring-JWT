@@ -26,24 +26,23 @@ public class JWTAuthenticationProcessingFilter extends AbstractAuthenticationPro
 		setAuthenticationManager(manager);
 	}
 
-	@Override
-	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
-		UserCredentials credentials = new ObjectMapper()
-				.readValue(request.getInputStream(), UserCredentials.class);
+	@Override // method นี้จะสร้าง UsernamePasswordAuthenticationToken และตรวจสอบดูผล authen
+			// ว่าผ่านไหม
+	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+			throws AuthenticationException, IOException, ServletException {
+		UserCredentials credentials = new ObjectMapper().readValue(request.getInputStream(), UserCredentials.class);
 
-		return getAuthenticationManager().authenticate(
-				new UsernamePasswordAuthenticationToken(
-						credentials.getUsername(),
-						credentials.getPassword(),
-						Collections.emptyList()
-				)
-				// เอาไปค้นว่ามี Username Password อยู่รึเปล่า ใน class CustomWebSecurityConfigurerAdapter
+		return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(
+				credentials.getUsername(), credentials.getPassword(), Collections.emptyList())
+		// เอาไปค้นว่ามี Username Password อยู่รึเปล่า ใน class
+		// CustomWebSecurityConfigurerAdapter
 		);
 	}
 
 	// ทำงานเมื่อผลการ authenticate สำเร็จ
 	@Override
-	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+			FilterChain chain, Authentication authResult) throws IOException, ServletException {
 		TokenAuthenticationService.addAuthentication(response, authResult.getName());
 	}
 }

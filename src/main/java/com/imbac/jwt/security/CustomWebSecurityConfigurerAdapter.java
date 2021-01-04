@@ -13,7 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 // start here! //
 // เป้น class ที่เอา properties ของ abstract class มาใช้งาน
 // และเพื่อเปลี่ยนแปลงการทำงานเดิม เราจะใช้ @Override ในการแก้ไข
-@Configuration //ให้spring security มาอ่าน config
+@Configuration // ให้spring security มาอ่าน config
 public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
 	@Bean
@@ -23,38 +23,28 @@ public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAda
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication()
-				.withUser("imbac")
-				.password(passwordEncoder().encode("1234"))
+		auth.inMemoryAuthentication().withUser("admin").password(passwordEncoder().encode("1234"))
 				.authorities("ADMIN");
-		// กำหนด username=imbac and password=1234
+		// กำหนด username=admin and password=1234
 	}
 
 	// เป้น overload medthod ที่รับค่า HttpSecurity
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable().authorizeRequests()
-				.antMatchers("/").permitAll()
+		http.csrf().disable().authorizeRequests().antMatchers("/").permitAll()
 				// ให้ path / เข้าถึงได้เลย
 				.antMatchers(HttpMethod.POST, "/login").permitAll()
 				// ให้ path /login เข้าถึงแบบ POST และ path /xxxx อื่นๆ
 				// จะถูกป้องกันโดย http method 403 forbidden
 				.anyRequest().authenticated()
-				// path อื่นทั้งหมดต่อง authenticate
-				.and()
-				.addFilterBefore(
-						// path /login ต่องถูกรับรองสิทธิ์ก่อนเพื่อสร้าง UsernamePasswordAuthenticationToken หรือ null
+				// path อื่นทั้งหมดต้อง authenticate
+				.and().addFilterBefore(
+						// path /login ต่องถูกรับรองสิทธิ์ก่อนเพื่อสร้าง
+						// UsernamePasswordAuthenticationToken หรือ null
 						// โดยคลาส JWTAuthenticationProcessingFilter
-						// ทำการแทรกแซง (filter chain) request ของ path /login ให้ทำบางแย่างก่อน
-						new JWTAuthenticationProcessingFilter(
-								"/login",
-								authenticationManager()
-						),
-						UsernamePasswordAuthenticationFilter.class
-				)
-				.addFilterBefore(
-						new JWTGenericFilterBean(),
-						UsernamePasswordAuthenticationFilter.class
-				);
+						// ทำการแทรกแซง (filter chain) request ของ path /login ให้ทำบางอย่างก่อน
+						new JWTAuthenticationProcessingFilter("/login", authenticationManager()),
+						UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(new JWTGenericFilterBean(), UsernamePasswordAuthenticationFilter.class);
 	}
 }
