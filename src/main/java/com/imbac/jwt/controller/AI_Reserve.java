@@ -3,7 +3,6 @@ package com.imbac.jwt.controller;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.imbac.jwt.pojo.AI_POJO;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
