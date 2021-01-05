@@ -16,7 +16,7 @@ public class TokenAuthenticationService {
 
 	static final long EXPIRATION_TIME = 1000 * 60; // กำหนดอายุการใช้งานของ token
 	static final String HEADER_STRING = "Authorization";
-	static final String TOKEN_PREFIX = "DBD @2020"; // secrete
+	static final String TOKEN_PREFIX = "DBD@2020"; // secrete
 	static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
 	// ทำหน้าที่สร้าง jwt หรือ token โดยจะใช้
